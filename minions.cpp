@@ -6,7 +6,7 @@
 //This program demonstrates the use of OpenGL and XWindows
 //
 //Texture maps are displayed.
-//Press B to see bigfoot roaming his forest.
+//Press M to see the minion roaming his forest.
 //
 //
 #include <stdio.h>
@@ -125,12 +125,12 @@ class Global {
 public:
 	int done;
 	int xres, yres;
-	GLuint bigfootTexture;
+	GLuint minionTexture;
 	GLuint silhouetteTexture;
 	GLuint forestTexture;
 	GLuint forestTransTexture;
 	GLuint umbrellaTexture;
-	int showBigfoot;
+	int showMinion;
 	int forest;
 	int silhouette;
 	int trees;
@@ -142,7 +142,7 @@ public:
 		done=0;
 		xres=800;
 		yres=600;
-		showBigfoot=0;
+		showMinion=0;
 		forest=1;
 		silhouette=1;
 		trees=1;
@@ -155,11 +155,11 @@ public:
 	}
 } g;
 
-class Bigfoot {
+class Minion {
 public:
 	Vec pos;
 	Vec vel;
-} bigfoot;
+} minion;
 
 class Raindrop {
 public:
@@ -391,22 +391,22 @@ void initOpengl(void)
 	//
 	//load the images file into a ppm structure.
 	//
-//	bigfootImage     = ppm6GetImage("./images/bigfoot.ppm");
+//	minionImage     = ppm6GetImage("./images/minion.ppm");
 //	forestImage      = ppm6GetImage("./images/forest.ppm");
 //	forestTransImage = ppm6GetImage("./images/forestTrans.ppm");
 //	umbrellaImage    = ppm6GetImage("./images/umbrella.ppm");
 	//create opengl texture elements
-	glGenTextures(1, &g.bigfootTexture);
+	glGenTextures(1, &g.minionTexture);
 	glGenTextures(1, &g.silhouetteTexture);
 	glGenTextures(1, &g.forestTexture);
 	glGenTextures(1, &g.umbrellaTexture);
 	//-------------------------------------------------------------------------
-	//bigfoot
+	//minion
 	//
 	int w = img[0].width;
 	int h = img[0].height;
 	//
-	glBindTexture(GL_TEXTURE_2D, g.bigfootTexture);
+	glBindTexture(GL_TEXTURE_2D, g.minionTexture);
 	//
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
@@ -428,7 +428,7 @@ void initOpengl(void)
 							GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
 	free(silhouetteData);
 	//glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
-	//	GL_RGB, GL_UNSIGNED_BYTE, bigfootImage->data);
+	//	GL_RGB, GL_UNSIGNED_BYTE, minionImage->data);
 	//-------------------------------------------------------------------------
 	//
 	//umbrella
@@ -444,7 +444,7 @@ void initOpengl(void)
 							GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
 	free(silhouetteData);
 	//glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
-	//	GL_RGB, GL_UNSIGNED_BYTE, bigfootImage->data);
+	//	GL_RGB, GL_UNSIGNED_BYTE, minionImage->data);
 	//-------------------------------------------------------------------------
 	//
 	//forest
@@ -472,7 +472,7 @@ void initOpengl(void)
 							GL_RGBA, GL_UNSIGNED_BYTE, ftData);
 	free(ftData);
 	//glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
-	//GL_RGB, GL_UNSIGNED_BYTE, bigfootImage->data);
+	//GL_RGB, GL_UNSIGNED_BYTE, minionImage->data);
 	//-------------------------------------------------------------------------
 }
 
@@ -489,8 +489,8 @@ void init() {
 	umbrella.width2 = umbrella.width * 0.5;
 	umbrella.radius = (float)umbrella.width2;
 	umbrella.shape = UMBRELLA_FLAT;
-	MakeVector(-150.0,180.0,0.0, bigfoot.pos);
-	MakeVector(6.0,0.0,0.0, bigfoot.vel);
+	MakeVector(-150.0,180.0,0.0, minion.pos);
+	MakeVector(6.0,0.0,0.0, minion.vel);
 }
 
 void checkMouse(XEvent *e)
@@ -536,9 +536,9 @@ int checkKeys(XEvent *e)
 	}
 	switch (key) {
 		case XK_m:
-			g.showBigfoot ^= 1;
-			if (g.showBigfoot) {
-				bigfoot.pos[0] = -250.0;
+			g.showMinion ^= 1;
+			if (g.showMinion) {
+				minion.pos[0] = -250.0;
 			}
 			break;
 		case XK_d:
@@ -665,34 +665,34 @@ void deleteRain(Raindrop *node)
 	node = NULL;
 }
 
-void moveBigfoot()
+void moveMinion()
 {
-	//move bigfoot...
+	//move minion...
 	int addgrav = 1;
 	//Update position
-	bigfoot.pos[0] += bigfoot.vel[0];
-	bigfoot.pos[1] += bigfoot.vel[1];
+	minion.pos[0] += minion.vel[0];
+	minion.pos[1] += minion.vel[1];
 	//Check for collision with window edges
-	if ((bigfoot.pos[0] < -140.0 && bigfoot.vel[0] < 0.0) ||
-		(bigfoot.pos[0] >= (float)g.xres+140.0 &&
-		bigfoot.vel[0] > 0.0))
+	if ((minion.pos[0] < -140.0 && minion.vel[0] < 0.0) ||
+		(minion.pos[0] >= (float)g.xres+140.0 &&
+		minion.vel[0] > 0.0))
 	{
-		bigfoot.vel[0] = -bigfoot.vel[0];
+		minion.vel[0] = -minion.vel[0];
 		addgrav = 0;
 	}
-	if ((bigfoot.pos[1] < 150.0 && bigfoot.vel[1] < 0.0) ||
-		(bigfoot.pos[1] >= (float)g.yres && bigfoot.vel[1] > 0.0)) {
-		bigfoot.vel[1] = -bigfoot.vel[1];
+	if ((minion.pos[1] < 150.0 && minion.vel[1] < 0.0) ||
+		(minion.pos[1] >= (float)g.yres && minion.vel[1] > 0.0)) {
+		minion.vel[1] = -minion.vel[1];
 		addgrav = 0;
 	}
 	//Gravity?
 	if (addgrav)
-		bigfoot.vel[1] -= 0.75;
+		minion.vel[1] -= 0.75;
 
     // Move the umbrella
     VecCopy(umbrella.pos, umbrella.lastpos);
-    umbrella.pos[0] = bigfoot.pos[0];
-    umbrella.pos[1] = bigfoot.pos[1] + 110;
+    umbrella.pos[0] = minion.pos[0];
+    umbrella.pos[1] = minion.pos[1] + 110;
 }
 
 
@@ -840,8 +840,8 @@ void checkRaindrops()
 
 void physics()
 {
-	if (g.showBigfoot)
-		moveBigfoot();
+	if (g.showMinion)
+		moveMinion();
 	if (g.showRain)
 		checkRaindrops();
 }
@@ -915,11 +915,11 @@ void render()
 			glTexCoord2f(1.0f, 1.0f); glVertex2i(g.xres, 0);
 		glEnd();
 	}
-	if (g.showBigfoot) {
+	if (g.showMinion) {
 		glPushMatrix();
-		glTranslatef(bigfoot.pos[0], bigfoot.pos[1], bigfoot.pos[2]);
+		glTranslatef(minion.pos[0], minion.pos[1], minion.pos[2]);
 		if (!g.silhouette) {
-			glBindTexture(GL_TEXTURE_2D, g.bigfootTexture);
+			glBindTexture(GL_TEXTURE_2D, g.minionTexture);
 		} else {
 			glBindTexture(GL_TEXTURE_2D, g.silhouetteTexture);
 			glEnable(GL_ALPHA_TEST);
@@ -927,7 +927,7 @@ void render()
 			glColor4ub(255,255,255,255);
 		}
 		glBegin(GL_QUADS);
-			if (bigfoot.vel[0] > 0.0) {
+			if (minion.vel[0] > 0.0) {
 				glTexCoord2f(0.0f, 1.0f); glVertex2i(-wid,-wid);
 				glTexCoord2f(0.0f, 0.0f); glVertex2i(-wid, wid);
 				glTexCoord2f(1.0f, 0.0f); glVertex2i( wid, wid);
